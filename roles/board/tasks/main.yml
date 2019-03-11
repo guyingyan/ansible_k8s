@@ -1,0 +1,16 @@
+---
+- name:  sysctl -w vm.max_map_count=262144
+  shell: sysctl -w vm.max_map_count=262144
+- name: copy file to  /lib/sysctl.d/
+  copy: src={{role_path}}/templates/90-system.conf dest=/lib/sysctl.d/
+
+- name: create /etc/board/cert
+  file: path=/etc/board/cert state=directory mode=755
+  tag: ca
+
+- name: copy ssl key
+  copy: src=/tmp/ssl/{{item}} dest=/etc/board/cert
+  with_items:
+    - "ca.pem"
+    - "ca-key.pem"
+  tags: ca

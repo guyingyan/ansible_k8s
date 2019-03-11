@@ -1,0 +1,28 @@
+---
+#vars:
+#  issue_cert_ip_sans: >-
+#    [
+#    {%- for host in groups['nodes'] -%}
+#    "{{ hostvars[host]['ansible_default_ipv4']['address'] }}",
+#    {%- if hostvars[host]['ip'] is defined -%}
+#    "{{ hostvars[host]['ip'] }}",
+#    {%- endif -%}
+#    {%- endfor -%}
+#    "127.0.0.1","::1"
+#    ]
+
+- name: create /tmp/ssl
+  file: path=/tmp/ssl state=directory mode=755
+  tags: ca
+
+- name: copy file
+  copy: src={{role_path}}/files/gen_node_key.sh dest=/tmp/ssl mode=755
+  tags: ca
+
+- name: test
+  shell: cd /tmp/ssl
+  tags: ca
+
+- name: generate ssl key
+  command: /tmp/ssl/gen_node_key.sh -n {{ add_node_ip }} chdir=/tmp/ssl 
+  tags: ca

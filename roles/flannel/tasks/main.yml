@@ -1,0 +1,8 @@
+---
+- name: copy init file
+  copy: src={{role_path}}/files/init.sh dest=/var/lib/yaml/init.sh mode=755
+
+- name: run flannel  
+  shell: /var/lib/yaml/init.sh http://127.0.0.1:8080
+
+  

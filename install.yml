@@ -1,0 +1,46 @@
+---
+- hosts: local
+  roles:
+    - ssl
+  tags: ca
+- hosts: all
+  roles:
+    - {role: set_fact}
+    - {role: hostname}
+    - {role: repo}
+    - {role: common}
+- hosts: nodes
+  roles:
+    - {role: docker.node}
+    - {role: node}
+    - {role: nfs-client}
+    - {role: istio.common}
+    - {role: istio.node}
+- hosts: masters
+  roles:
+    - {role: docker}
+    - {role: master}
+    - {role: helm}
+    - {role: istio.common}
+    - {role: istio}
+    - {role: flannel}
+    - {role: kubectlCMD}
+#- hosts: nfs-server
+#  roles:
+#    - {role: nfs-server}
+#    - {role: nfs-client}
+#- hosts: board
+#  roles:
+#    - {role: docker}
+#    - {role: docker-compose}
+#    - {role: board}
+    #- board-install
+#- hosts: registry
+#  roles:
+#    - {role: docker}
+#    - {role: registry}
+#- hosts: jenkins_node
+#  roles:
+#    - {role: git}
+#    - {role: docker}
+

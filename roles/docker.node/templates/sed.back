@@ -1,0 +1,1 @@
+sed -i '/ExecStart/s/$/ --iptables=false --insecure-registry {{registry_ip_address}}:5000/' /usr/lib/systemd/system/docker.service

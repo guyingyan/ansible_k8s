@@ -1,0 +1,49 @@
+---
+
+- name: mkdir -p /tmp/istio
+  shell: mkdir -p /tmp/istio
+
+- name: setenforce 
+  shell: setenforce 0
+  ignore_errors: yes
+
+
+- name: copy systemd files to master
+  template: src={{role_path}}/templates/{{item}} dest=/root/.kube/
+  with_items:
+    - "config"
+
+- name: copy helm file
+  copy: src={{role_path}}/../../pre-env/istio/helm dest=/usr/bin mode=755
+
+- name: copy istio-0.8.0-linux.tar.gz file
+  copy: src={{role_path}}/../../pre-env/istio/istio-0.8.0-linux.tar.gz dest=/tmp/istio mode=755
+
+- name: helm init command
+  shell: helm init
+  ignore_errors: yes
+  
+
+- name: tar -zxvf istio-0.8.0-linux.tar.gz
+  shell: tar zxvf /tmp/istio/istio-0.8.0-linux.tar.gz -C /tmp/istio
+
+- name: install istio
+  shell: helm template /tmp/istio/istio-0.8.0/install/kubernetes/helm/istio --name istio --namespace istio-system --set sidecarInjectorWebhook.enabled=false >  /var/lib/yaml/istio.yaml
+
+- name: copy istio.yaml to /var/lib/yaml
+  template: src={{role_path}}/templates/{{item}} dest=/var/lib/yaml/
+  with_items:
+    - "istio.yaml"
+    - "coredns.yaml"
+
+- name: kubectl create namespace istio-system
+  shell: kubectl create namespace istio-system
+  ignore_errors: yes
+- name: kubectl create -f /var/lib/yaml/istio.yaml and coredns.yaml
+  shell: kubectl create -f /var/lib/yaml/{{item}}
+  with_items:
+    - "istio.yaml"
+    - "coredns.yaml"
+  ignore_errors: yes
+
+

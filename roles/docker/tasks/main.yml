@@ -1,0 +1,13 @@
+---
+- name: install docker-ce
+  yum: name=docker-ce state=latest
+
+- name: start docker
+  service: name=docker enabled=yes state=started
+
+- name: config daemon.json file
+  copy: src={{role_path}}/files/daemon.json dest=/etc/docker/daemon.json
+
+- name: restart docker
+  service: name=docker enabled=yes state=restarted
+

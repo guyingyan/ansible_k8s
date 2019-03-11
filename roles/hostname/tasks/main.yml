@@ -1,0 +1,5 @@
+---
+
+- name: modify hostname
+  shell: hostname {{ ansible_default_ipv4['address'] }} 
+  

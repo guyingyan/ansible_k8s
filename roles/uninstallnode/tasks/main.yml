@@ -1,0 +1,77 @@
+---
+- name: systemctl stop k8s-loadimages
+  shell: systemctl stop k8s-loadimages
+  ignore_errors: yes
+- name: systemctl stop kubelet
+  shell: systemctl stop kubelet
+  ignore_errors: yes
+
+- name: delete k8s-loadimages.service
+  shell: rm -rf /usr/lib/systemd/system/k8s-loadimages.service
+- name: delete kubelet.service
+  shell: rm -rf /usr/lib/systemd/system/kubelet.service
+
+- name: systemctl daemon-reload
+  shell: systemctl daemon-reload
+  ignore_errors: yes
+
+- name: delete /etc/kubernetes/{manifests,certs}
+  shell: rm -rf /etc/kubernetes/{manifests,certs}
+  ignore_errors: yes
+- name: delete /var/lib/k8s/images
+  shell: rm -rf  /var/lib/k8s/images
+  ignore_errors: yes
+- name: delete /opt/cni/bin
+  shell: rm -rf /opt/cni/bin
+- name: delete /var/lib/kubelet
+  shell: rm -rf /var/lib/kubelet
+  ignore_errors: yes
+- name: delete /var/lib/k8sconfig
+  shell: rm -rf /var/lib/k8sconfig
+  ignore_errors: yes
+- name: delete all container
+  shell: docker rm -f $(docker ps|awk '{print $1}')
+  ignore_errors: yes
+- name: delete all images
+  shell: docker rmi -f $(docker images|awk '{print $3}')
+  ignore_errors: yes
+- name: delete flannel
+  shell: ip link delete flannel.1
+  ignore_errors: yes
+- name: delete cni
+  shell: ip link delete cni0
+  ignore_errors: yes
+
+- name: copy unmount file
+  copy: src={{role_path}}/files/unmount.sh dest=/var/lib/yaml/unmount.sh mode=755
+  ignore_errors: yes
+
+- name: run unmount.sh
+  shell: /var/lib/yaml/unmount.sh
+  ignore_errors: yes
+
+- name: delete /var/lib/k8s/images
+  shell: rm -rf  /var/lib/k8s/images
+- name: delete /var/lib/yaml
+  file: path=/var/lib/yaml state=absent
+- name: delete /opt/cni/bin
+  file: path=/opt/cni/bin state=absent
+- name: delete /var/lib/kubelet
+  file: path=/var/lib/kubelet state=absent
+
+- name: delete /var/lib/k8sconfig
+  file: path=/var/lib/k8sconfig state=absent
+
+- name: delete /run/flannel
+  shell: rm -rf /run/flannel
+  ignore_errors: yes
+
+- name: delete /usr/bin/kubelet
+  file: path=/usr/bin/kubelet state=absent
+- name: delete /var/lib/yaml
+  shell: rm -rf /var/lib/yaml
+  ignore_errors: yes
+
+- name: delete /var/lib/cni
+  shell: rm -rf /var/lib/cni
+  ignore_errors: yes

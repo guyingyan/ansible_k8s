@@ -1,0 +1,12 @@
+---
+
+- name: create /var/lib/k8s/images
+  shell: mkdir -p /var/lib/k8s/images
+
+- name: copy pause images to images
+  copy: src={{role_path}}/../../pre-env/master_images/{{item}} dest=/var/lib/k8s/images
+  with_items:
+    - "kube-controllersv104.tar"
+    - "calico-cniv1-11-5.tar"
+    - "caliconodev269.tar"
+
